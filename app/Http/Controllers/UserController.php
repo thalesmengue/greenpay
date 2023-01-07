@@ -29,20 +29,6 @@ class UserController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function store(Request $request): JsonResponse
-    {
-        return response()->json([
-            'data' => $this->user->create($request->all())
-        ], Response::HTTP_CREATED);
-    }
-
-    public function update(Request $request, $id): JsonResponse
-    {
-        return response()->json([
-            'data' => $this->user->update($request->all(), $id)
-        ], Response::HTTP_OK);
-    }
-
     public function destroy($id): JsonResponse
     {
         return response()->json([

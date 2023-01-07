@@ -2,15 +2,70 @@
 
 namespace App\Services;
 
+
+
+use App\Events\Registered;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Symfony\Component\HttpFoundation\Response;
+
 class AuthService
 {
-    public function register()
+    public function register($data): JsonResponse
     {
+        $document = $data['document'];
 
+        $role = match (strlen($document)) {
+            11 => 'common',
+            14 => 'shopkeeper'
+        };
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'document' => $document,
+            'role' => $role,
+        ]);
+
+        event(new Registered($user));
+
+        $token = $user->createToken('access_token')->accessToken;
+
+        return response()->json([
+            'data' => $user,
+            'access_token' => $token,
+        ]);
     }
 
-    public function login()
+    public function login($data): JsonResponse
     {
+        $credentials = request(['email', 'password']);
 
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $user = request()->user();
+
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->token;
+        $token->save();
+
+        return response()->json([
+            'data' => $user,
+            'access_token' => $tokenResult->accessToken,
+            'token_type' => 'Bearer',
+            'expires_at' => Carbon::parse(
+                $tokenResult->token->expires_at
+            )->toDateTimeString()
+        ]);
     }
 }

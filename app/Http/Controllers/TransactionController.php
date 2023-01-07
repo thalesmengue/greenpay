@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\UserException;
 use App\Exceptions\WalletException;
+use App\Http\Requests\TransactionRequest;
 use App\Services\TransactionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,10 +18,10 @@ class TransactionController extends Controller
     {
     }
 
-    public function transaction(Request $request): JsonResponse
+    public function transaction(TransactionRequest $request): JsonResponse
     {
         return response()->json([
-            'data' => $this->transactionService->transaction($request->all())
+            'data' => $this->transactionService->transaction($request->validated())
         ], Response::HTTP_OK);
     }
 }
