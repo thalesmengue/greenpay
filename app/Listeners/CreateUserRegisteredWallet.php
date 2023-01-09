@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Str;
 
-class CreateUserRegisteredWallet
+class CreateUserRegisteredWallet implements ShouldQueue
 {
     public function handle(Registered $event): void
     {
