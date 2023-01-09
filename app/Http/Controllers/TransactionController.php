@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\TransactionException;
 use App\Exceptions\UserException;
 use App\Exceptions\WalletException;
 use App\Http\Requests\TransactionRequest;
@@ -20,8 +21,12 @@ class TransactionController extends Controller
 
     public function transaction(TransactionRequest $request): JsonResponse
     {
-        return response()->json([
-            'data' => $this->transactionService->transaction($request->validated())
-        ], Response::HTTP_OK);
+        try {
+            return $this->transactionService->transaction($request->validated());
+        } catch (UserException|TransactionException|WalletException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
     }
 }

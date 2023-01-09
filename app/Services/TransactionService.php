@@ -9,53 +9,56 @@ use App\Exceptions\UserException;
 use App\Exceptions\WalletException;
 use App\Models\Transaction;
 use App\Models\Wallet;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Psy\Util\Json;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class TransactionService
 {
     public function __construct(
-        private NotificationClient $notification,
+        private NotificationClient  $notification,
         private AuthorizationClient $authorization
     )
     {
     }
 
-
-    public function transaction(array $data): array
+    public function transaction(array $data): JsonResponse
     {
-        $payer = Wallet::query()->with('user')->where('keeper_id', '=', $data['payer_id'])->first();
-        $receiver = Wallet::query()->where('keeper_id', '=', $data['receiver_id'])->first();
-        $amount = $data['amount'];
+        return DB::transaction(function () use ($data) {
+            $payer = Wallet::query()->with('user')->where('keeper_id', '=', $data['payer_id'])->first();
+            $receiver = Wallet::query()->where('keeper_id', '=', $data['receiver_id'])->first();
+            $amount = $data['amount'];
 
-        if ($payer->user->role === 'shopkeeper') {
-            throw UserException::cantSendTransaction();
-        }
+            if ($payer->user->role === 'shopkeeper') {
+                throw UserException::cantSendTransaction();
+            }
 
-        if ($payer->balance < $amount) {
-            throw WalletException::insufficientBalance();
-        }
+            if ($payer->balance < $amount) {
+                throw WalletException::insufficientBalance();
+            }
 
-        if ($this->authorization->authorize() !== "Autorizado") {
-            throw TransactionException::transactionUnauthorized();
-        }
+            if ($this->authorization->authorize() != "Autorizado") {
+                throw TransactionException::transactionUnauthorized();
+            }
 
-        $payer->decrement('balance', $amount);
-        $receiver->increment('balance', $amount);
+            $payer->decrement('balance', $amount);
+            $receiver->increment('balance', $amount);
 
-        $transaction = Transaction::create([
-            'payer_id' => $payer->id,
-            'receiver_id' => $receiver->id,
-            'amount' => $amount,
-        ]);
+            $transaction = Transaction::create([
+                'payer_id' => $payer->id,
+                'receiver_id' => $receiver->id,
+                'amount' => $amount,
+            ]);
 
-        if ($this->notification->notify() !== "Success") {
-            throw TransactionException::unavailabilityToSendEmail();
-        }
+            if ($this->notification->notify() != "Success") {
+                throw TransactionException::unavailabilityToSendEmail();
+            }
 
-        return [
-            'transaction' => $transaction,
-            'payer' => $payer,
-            'receiver' => $receiver
-        ];
+            return response()->json([
+                'transaction' => $transaction,
+            ], Response::HTTP_CREATED);
+        });
     }
 }

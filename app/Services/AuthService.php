@@ -5,6 +5,7 @@ namespace App\Services;
 
 
 use App\Events\Registered;
+use App\Http\Requests\LoginAuthRequest;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
