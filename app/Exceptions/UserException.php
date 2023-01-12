@@ -9,6 +9,6 @@ class UserException extends Exception
 {
     public static function cantSendTransaction(): UserException
     {
-        return new self('Shopkeepers aren\'t allowed to send transactions!', Response::HTTP_UNAUTHORIZED);
+        return new self('Shopkeepers cannot send transactions!', Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 }

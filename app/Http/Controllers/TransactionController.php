@@ -26,7 +26,7 @@ class TransactionController extends Controller
         } catch (UserException|TransactionException|WalletException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], Response::HTTP_BAD_REQUEST);
+            ], $e->getCode());
         }
     }
 }
