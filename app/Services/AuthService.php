@@ -41,7 +41,7 @@ class AuthService
         return response()->json([
             'data' => $user,
             'access_token' => $token,
-        ]);
+        ], Response::HTTP_CREATED);
     }
 
     public function login($data): JsonResponse
@@ -56,17 +56,13 @@ class AuthService
 
         $user = request()->user();
 
-        $tokenResult = $user->createToken('Personal Access Token');
+        $tokenResult = $user->createToken('access_token');
         $token = $tokenResult->token;
         $token->save();
 
         return response()->json([
             'data' => $user,
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString()
-        ]);
+            'access_token' => $tokenResult->accessToken
+        ], Response::HTTP_OK);
     }
 }

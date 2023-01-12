@@ -26,7 +26,7 @@ class UserController extends Controller
     {
         return response()->json([
             'data' => $this->user->find($id)
-        ], Response::HTTP_OK);
+        ], Response::HTTP_FOUND);
     }
 
     public function destroy($id): JsonResponse

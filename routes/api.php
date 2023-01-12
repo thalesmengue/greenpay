@@ -17,11 +17,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::middleware('auth:api')->group(function () {
-    Route::apiResource('user', UserController::class)->only(['index', 'show', 'destroy']);
-    Route::post('transaction', [TransactionController::class, 'transaction']);
+    Route::apiResource('user', UserController::class)->only(['show', 'destroy']);
+    Route::post('transaction', [TransactionController::class, 'transaction'])->name('transaction');
 });
 

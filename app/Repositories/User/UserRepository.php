@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function all(): Collection
+    public function all(): User|Collection
     {
         return User::all();
     }
 
-    public function find($id): Collection
+    public function find($id): User
     {
         return User::find($id);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\Document;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
@@ -27,7 +28,7 @@ class RegisterAuthRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'min:3', 'max: 255'],
             'email' => ['required', 'email', 'min:3', 'max: 255', 'unique:users'],
-            'document' => ['required', 'string', 'min:11', 'max:14', 'unique:users'],
+            'document' => ['required', 'string', 'unique:users', new Document],
             'password' => ['required', 'string', 'min:8', 'max: 255', Password::default()],
         ];
     }
