@@ -69,6 +69,6 @@ Para rodar os testes digite:
 ```
 
 ### Referências
-[Laravel](https://laravel.com/docs/9.x/installation)
-[PHP](https://www.php.net/)
-[Passport](https://laravel.com/docs/9.x/passport)
+- [Laravel](https://laravel.com/docs/9.x/installation)
+- [PHP](https://www.php.net/)
+- [Passport](https://laravel.com/docs/9.x/passport)
