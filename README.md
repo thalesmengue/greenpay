@@ -28,6 +28,8 @@ ser assíncrono, assim, o usuário vai ser registrado, e o listener de criação
 que valida o número aceito de documentos que é 11 para CPF e 14 para CNPJ, também validando se apenas foram inseridos
 dígitos no campo.
 - Os campos CNPJ/CPF e o email foram setados como ```unique``` para garantir que o usuário consiga ter apenas uma conta.
+- Adicionei autenticação no projeto, então, para que o usuário possa realizar uma transação deve estar logado, caso contrário,
+não estará autorizado a realizar a transação.
 
 ### Como rodar o projeto
 ```bash
