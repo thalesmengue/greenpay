@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Exceptions\TransactionException;
 use App\Exceptions\UserException;
+use App\Exceptions\WalletException;
 use App\Models\User;
 use App\Models\Wallet;
 use Carbon\Carbon;
@@ -76,8 +77,6 @@ class TransactionControllerTest extends TestCase
 
         Passport::actingAs($user);
 
-        $this->withoutExceptionHandling();
-
         $response = $this->post(route('transaction'), [
             'payer_id' => $user->id,
             'receiver_id' => $receiver->id,
@@ -88,5 +87,25 @@ class TransactionControllerTest extends TestCase
 
         $response->assertUnprocessable();
         $response->assertSee($exception->getMessage());
+    }
+
+    public function test_user_cant_send_transaction_to_yourself()
+    {
+        $user = User::factory()->has(Wallet::factory()->state(['balance' => 200]))->state(['role' => 'shopkeeper'])->create();
+
+        Passport::actingAs($user);
+
+        $this->withoutExceptionHandling();
+
+        $response = $this->post(route('transaction'), [
+            'payer_id' => $user->id,
+            'receiver_id' => $user->id,
+            'amount' => 100,
+        ]);
+
+        $exception = TransactionException::cantSendTransactionToYourself();
+
+        $response->assertSee($exception->getMessage());
+        $response->assertStatus($exception->getCode());
     }
 }
