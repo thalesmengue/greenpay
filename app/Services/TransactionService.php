@@ -11,7 +11,6 @@ use App\Models\Transaction;
 use App\Models\Wallet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Psy\Util\Json;
 use Symfony\Component\HttpFoundation\Response;
 
 
@@ -30,6 +29,10 @@ class TransactionService
             $payer = Wallet::query()->with('user')->where('keeper_id', '=', $data['payer_id'])->first();
             $receiver = Wallet::query()->where('keeper_id', '=', $data['receiver_id'])->first();
             $amount = $data['amount'];
+
+            if ($payer->id === $receiver->id) {
+                throw TransactionException::cantSendTransactionToYourself();
+            }
 
             if ($payer->user->role === 'shopkeeper') {
                 throw UserException::cantSendTransaction();

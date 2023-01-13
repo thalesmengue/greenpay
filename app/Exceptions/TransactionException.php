@@ -16,4 +16,9 @@ class TransactionException extends Exception
     {
         return new self('The current transaction isn\'t authorized!', Response::HTTP_UNAUTHORIZED);
     }
+
+    public static function cantSendTransactionToYourself(): TransactionException
+    {
+        return new self('You cannot send transaction to yourself!', Response::HTTP_BAD_REQUEST);
+    }
 }
